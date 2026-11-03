@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>AR Video</title>
+
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    #message {
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      z-index: 10;
+      background: white;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="message">
+    Đang chuẩn bị camera...
+  </div>
+
+  <a-scene
+    mindar-image="imageTargetSrc: ./targets.mind;"
+    color-space="sRGB"
+    renderer="colorManagement: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: true">
+
+    <a-assets>
+      <video
+        id="video"
+        src="./video.mp4"
+        preload="auto"
+        loop
+        muted
+        playsinline
+        webkit-playsinline>
+      </video>
+    </a-assets>
+
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
+
+    <a-entity id="target"
+              mindar-image-target="targetIndex: 0">
+
+      <a-video
+        src="#video"
+        position="0 0 0.05"
+        width="1"
+        height="0.5625">
+      </a-video>
+
+    </a-entity>
+  </a-scene>
+
+  <script>
+    const scene = document.querySelector("a-scene");
+    const target = document.querySelector("#target");
+    const video = document.querySelector("#video");
+    const message = document.querySelector("#message");
+
+    target.addEventListener("targetFound", async () => {
+      message.textContent = "Đã nhận diện ảnh! Đang phát video...";
+
+      try {
+        await video.play();
+        message.textContent = "Đã nhận diện ảnh!";
+      } catch (error) {
+        message.textContent =
+          "Chạm vào màn hình để phát video.";
+      }
+    });
+
+    target.addEventListener("targetLost", () => {
+      video.pause();
+      message.textContent = "Hãy hướng camera vào ảnh nhận diện.";
+    });
+
+    scene.addEventListener("arReady", () => {
+      message.textContent = "Hãy hướng camera vào ảnh nhận diện.";
+    });
+
+    scene.addEventListener("arError", () => {
+      message.textContent =
+        "Không khởi động được AR. Hãy kiểm tra camera và kết nối mạng.";
+    });
+
+    video.addEventListener("error", () => {
+      message.textContent =
+        "Không tải được video. Hãy kiểm tra file video.mp4.";
+    });
+  </script>
+</body>
+</html>
