@@ -35,7 +35,21 @@
   <div id="message">
     Đang chuẩn bị camera...
   </div>
-
+<button id="soundBtn" style="
+  position: fixed;
+  bottom: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #1677ff;
+  color: white;
+  font-size: 16px;
+">
+  Bật âm thanh
+</button>
   <a-scene
     mindar-image="imageTargetSrc: ./targets.mind;"
     color-space="sRGB"
@@ -77,6 +91,17 @@
     const scene = document.querySelector("a-scene");
     const target = document.querySelector("#target");
     const video = document.querySelector("#video");
+    const soundBtn = document.querySelector("#soundBtn");
+
+soundBtn.addEventListener("click", async () => {
+  video.muted = false;
+  try {
+    await video.play();
+    soundBtn.textContent = "Đã bật âm thanh";
+  } catch (error) {
+    soundBtn.textContent = "Chưa thể phát âm thanh";
+  }
+});
     const message = document.querySelector("#message");
 
     target.addEventListener("targetFound", async () => {
